@@ -22,6 +22,8 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
+// MODEL DEFINITIONS
+
 const Model = Sequelize.Model;
 //const DataTypes = Sequelize.DataTypes;
 const uuid = require('uuid');
@@ -82,6 +84,10 @@ Student.belongsTo(Group);
 // automatically create the table (or modify it as needed) according to the models definition
 sequelize.sync();
 
+// ROUTES HANDLING
+
+// GROUPS ROUTES
+
 app.get("/", (req, res) => res.send("Simple REST API enabled with Sequelize"));
 
 app.get('/groups', async function (req, res) {
@@ -118,7 +124,7 @@ app.post('/groups', async function (req, res) {
 
   if (!createdGroup) {
     res.statusCode = 400;
-    return res.end('Cannot create a group');
+    return res.end('Failed to create group');
   }
   else {
     res.statusCode = 200;
@@ -145,6 +151,36 @@ app.delete('/groups/:id', async function (req, res) {
   }
 });
 
+// STUDENTS ROUTES
+
+app.get('/students', async function (req, res) {
+  const students = await Student.findAll();
+  
+  if (!students) {
+    res.statusCode = 404;
+    return res.end("Failed to retrieve students");
+  }
+  else {
+    res.statusCode = 200;
+    return res.json(students);
+  }
+});
+
+app.get('/students/:id', async function (req, res) {
+  const { id } = req.params;
+  
+  const student = await Student.findOne({ where: { id }, include: Group });
+  
+  if (!student) {
+    res.statusCode = 404;
+    return res.end("Student with this id was not found");
+  }
+  else {
+    res.statusCode = 200;
+    return res.json(student);
+  }
+});
+
 app.post('/students', async function (req, res) {
   if (!req.body) {
     res.statusCode = 400;
@@ -167,6 +203,55 @@ app.post('/students', async function (req, res) {
   else {
     res.statusCode = 200;
     return res.end('Student successfully created');
+  }
+});
+
+app.put('/students/:id', async function (req, res) {
+  if (!req.body) {
+    res.statusCode = 400;
+    return res.end("Body is required");
+  }
+  
+  const { id } = req.params;
+  const { firstName, lastName, groupId } = req.body;
+
+  if (!firstName || !lastName || !groupId) {
+    res.statusCode = 400;
+    return res.end('Args are invalid');
+  }
+  
+  const student = await Student.update({ firstName, lastName, groupId }, {
+    where: {
+      id: id
+    }
+  });
+  
+  if (!student) {
+    res.statusCode = 404;
+    return res.end("Failed to update the student");
+  }
+  else {
+    res.statusCode = 200;
+    return res.end('Student successfully updated');
+  }
+});
+
+app.delete('/students/:id', async function (req, res) {
+  const { id } = req.params;
+  
+  const deletedStudent = await Student.destroy({
+    where: {
+      id: id
+    }
+  });
+
+  if (!deletedStudent) {
+    res.statusCode = 200;
+    return res.end("Student with this id was not found");
+  }
+  else {
+    res.statusCode = 200;
+    return res.end("Student successfully deleted");
   }
 });
 
