@@ -1,9 +1,9 @@
-import React from 'react'; // preserve-line
-import { useMutation } from '@apollo/react-hooks'; // preserve-line
+import React from 'react';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
-import Button from '../components/button'; // preserve-line
-import { GET_LAUNCH } from './cart-item'; // preserve-line
+import Button from '../components/button';
+import { GET_LAUNCH } from './cart-item';
 import * as GetCartItemsTypes from '../pages/__generated__/GetCartItems';
 import * as BookTripsTypes from './__generated__/BookTrips';
 
@@ -23,12 +23,7 @@ export const BOOK_TRIPS = gql`
 interface BookTripsProps extends GetCartItemsTypes.GetCartItems {}
 
 const BookTrips: React.FC<BookTripsProps> = ({ cartItems }) => {
-  const [
-    bookTrips, { data }
-  ] = useMutation<
-    BookTripsTypes.BookTrips, 
-    BookTripsTypes.BookTripsVariables
-  > (
+  const [bookTrips, { data }] = useMutation<BookTripsTypes.BookTrips, BookTripsTypes.BookTripsVariables>(
     BOOK_TRIPS,
     {
       variables: { launchIds: cartItems },
@@ -36,7 +31,6 @@ const BookTrips: React.FC<BookTripsProps> = ({ cartItems }) => {
         query: GET_LAUNCH,
         variables: { launchId },
       })),
-
       update(cache) {
         cache.writeData({ data: { cartItems: [] } });
       }
