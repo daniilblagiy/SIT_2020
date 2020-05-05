@@ -8,7 +8,6 @@ import * as GetLaunchListTypes from './__generated__/GetLaunchList';
 
 export const LAUNCH_TILE_DATA = gql`
   fragment LaunchTile on Launch {
-    __typename
     id
     isBooked
     rocket {
@@ -22,8 +21,8 @@ export const LAUNCH_TILE_DATA = gql`
   }
 `;
 
-export const GET_LAUNCHES = gql`
-  query GetLaunchList($after: String) {
+const GET_LAUNCHES = gql`
+  query launchList($after: String) {
     launches(after: $after) {
       cursor
       hasMore
@@ -41,15 +40,16 @@ const Launches: React.FC<LaunchesProps> = () => {
   const { 
     data, 
     loading, 
-    error, 
-    fetchMore 
+    error,
+    fetchMore
   } = useQuery<
     GetLaunchListTypes.GetLaunchList, 
     GetLaunchListTypes.GetLaunchListVariables
   >(GET_LAUNCHES);
 
   if (loading) return <Loading />;
-  if (error || !data) return <p>ERROR</p>;
+  if (error) return <p>ERROR</p>;
+  if (!data) return <p>Not found</p>;
 
   return (
     <Fragment>
@@ -59,14 +59,16 @@ const Launches: React.FC<LaunchesProps> = () => {
         data.launches.launches.map((launch: any) => (
           <LaunchTile key={launch.id} launch={launch} />
         ))}
-      {data.launches &&
+      {data.launches && 
         data.launches.hasMore && (
           <Button
             onClick={() =>
+            
               fetchMore({
                 variables: {
                   after: data.launches.cursor,
                 },
+              
                 updateQuery: (prev, { fetchMoreResult, ...rest }) => {
                   if (!fetchMoreResult) return prev;
                   return {
@@ -85,7 +87,8 @@ const Launches: React.FC<LaunchesProps> = () => {
           >
             Load More
           </Button>
-        )}
+        )
+      }
     </Fragment>
   );
 }
