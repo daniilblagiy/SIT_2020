@@ -41,7 +41,7 @@ const BookTrips: React.FC<BookTripsProps> = ({ cartItems }) => {
     ? <p data-testid="message">{data.bookTrips.message}</p>
     : (
       <Button 
-        onClick={() => bookTrips()} 
+        onClick={() => {bookTrips()}} 
         data-testid="book-button">
         Book All
       </Button>

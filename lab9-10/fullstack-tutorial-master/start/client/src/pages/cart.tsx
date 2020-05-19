@@ -7,6 +7,8 @@ import { CartItem, BookTrips } from '../containers';
 import { RouteComponentProps } from '@reach/router';
 import * as GetCartItemsTypes from './__generated__/GetCartItems';
 
+import TakeMoney from '../CheckoutForm';
+
 export const GET_CART_ITEMS = gql`
   query GetCartItems {
     cartItems @client
@@ -35,6 +37,7 @@ const Cart: React.FC<CartProps> = () => {
             <CartItem key={launchId} launchId={launchId} />
           ))}
           <BookTrips cartItems={!!data ? data.cartItems : []} />
+          <TakeMoney />
         </Fragment>
       )}
     </Fragment>
