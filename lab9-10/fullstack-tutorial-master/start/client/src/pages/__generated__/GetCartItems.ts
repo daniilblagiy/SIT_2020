@@ -8,4 +8,5 @@
 
 export interface GetCartItems {
   cartItems: string[];
+  to_pay: boolean;
 }

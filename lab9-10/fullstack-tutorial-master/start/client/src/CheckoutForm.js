@@ -1,27 +1,69 @@
-import React from 'react'
-import StripeCheckout from 'react-stripe-checkout';
+import React from 'react';
+import {useStripe, useElements, CardElement} from '@stripe/react-stripe-js';
 
-export default class TakeMoney extends React.Component {
-  onToken = (token) => {
-    fetch('/save-stripe-token', {
-      method: 'POST',
-      body: JSON.stringify(token),
-    }).then(response => {
-      response.json().then(data => {
-        alert(`We are in business, ${data.email}`);
-      });
+export default function CheckoutForm() {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event) => {
+    // We don't want to let default form submission happen here,
+    // which would refresh the page.
+    event.preventDefault();
+
+    const result = await stripe.createPaymentMethod({
+      type: 'card',
+      card: elements.getElement(CardElement),
+      billing_details: {
+        // Include any additional collected billing details.
+        name: 'Jenny Rosen',
+      },
     });
-  }
 
-  // ...
+    handlePaymentMethodResult(result);
+  };
 
-  render() {
-    return (
-      // ...
-      <StripeCheckout
-        token={this.onToken}
-        stripeKey="pk_test_TYooMQauvdEDq54NiTphI7jx"
-      />
-    )
-  }
+  const handlePaymentMethodResult = async (result) => {
+    if (result.error) {
+      // An error happened when collecting card details,
+      // show `result.error.message` in the payment form.
+    } else {
+      // Otherwise send paymentMethod.id to your server (see Step 3)
+      localStorage.setItem('to_pay', "false")
+      const response = await fetch('/pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payment_method_id: result.paymentMethod.id,
+        }),
+      });
+
+      const serverResponse = await response.json();
+
+      handleServerResponse(serverResponse);
+    }
+  };
+
+  const handleServerResponse = (serverResponse) => {
+    if (serverResponse.error) {
+      // An error happened when charging the card,
+      // show the error in the payment form.
+    } else {
+      // Show a success message
+    }
+  };
+
+  const handleCardChange = (event) => {
+    if (event.error) {
+      // Show `event.error.message` in the payment form.
+    }
+  };
+
+  return (
+    <form onSubmit={this.handleSubmit}>
+      <CardElement onChange={handleCardChange} />
+      <button type="submit" disabled={!stripe}>
+        Submit Payment
+      </button>
+    </form>
+  );
 }

@@ -7,6 +7,8 @@ import { GET_LAUNCH } from './cart-item';
 import * as GetCartItemsTypes from '../pages/__generated__/GetCartItems';
 import * as BookTripsTypes from './__generated__/BookTrips';
 
+import TakeMoney from '../CheckoutForm';
+
 export const BOOK_TRIPS = gql`
   mutation BookTrips($launchIds: [ID]!) {
     bookTrips(launchIds: $launchIds) {
@@ -22,7 +24,7 @@ export const BOOK_TRIPS = gql`
 
 interface BookTripsProps extends GetCartItemsTypes.GetCartItems {}
 
-const BookTrips: React.FC<BookTripsProps> = ({ cartItems }) => {
+const BookTrips: React.FC<BookTripsProps> = ({ cartItems, to_pay }) => {
   const [bookTrips, { data }] = useMutation<BookTripsTypes.BookTrips, BookTripsTypes.BookTripsVariables>(
     BOOK_TRIPS,
     {
@@ -32,8 +34,9 @@ const BookTrips: React.FC<BookTripsProps> = ({ cartItems }) => {
         variables: { launchId },
       })),
       update(cache) {
-        cache.writeData({ data: { cartItems: [] } });
-      }
+        cache.writeData({ data: { cartItems: [], to_pay: true } });
+        localStorage.setItem('to_pay', "true")
+      },
     }
   );
 

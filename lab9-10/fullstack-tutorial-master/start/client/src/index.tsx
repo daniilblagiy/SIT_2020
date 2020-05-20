@@ -33,6 +33,7 @@ cache.writeData({
   data: {
     isLoggedIn: !!localStorage.getItem('token'),
     cartItems: [],
+    to_pay : false,
   },
 });
 
