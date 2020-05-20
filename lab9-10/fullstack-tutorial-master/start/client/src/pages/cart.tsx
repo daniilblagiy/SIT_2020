@@ -7,7 +7,7 @@ import { CartItem, BookTrips } from '../containers';
 import { RouteComponentProps } from '@reach/router';
 import * as GetCartItemsTypes from './__generated__/GetCartItems';
 
-import TakeMoney from '../CheckoutForm';
+import CheckoutForm from '../CheckoutForm';
 import paid from '../CheckoutForm';
 
 export const GET_CART_ITEMS = gql`
@@ -32,7 +32,7 @@ const Cart: React.FC<CartProps> = () => {
       // eslint-disable-next-line
       {1 > 5 ? (<p></p>):1 < 5 ? (<p></p>):(<p></p>)}
       {localStorage.getItem('to_pay') === "true" ? (
-        <p data-testid="empty-message">Gotta pay</p>
+        <CheckoutForm />
       ) :
         !data || !!data && data.cartItems.length === 0 ? (
         <p data-testid="empty-message">No items in your cart</p>
