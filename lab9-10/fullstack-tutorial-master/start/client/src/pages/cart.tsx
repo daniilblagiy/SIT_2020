@@ -8,7 +8,6 @@ import { RouteComponentProps } from '@reach/router';
 import * as GetCartItemsTypes from './__generated__/GetCartItems';
 
 import CheckoutForm from '../CheckoutForm';
-import paid from '../CheckoutForm';
 
 export const GET_CART_ITEMS = gql`
   query GetCartItems {

@@ -1,5 +1,7 @@
 const { paginateResults } = require('./utils');
 
+const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
+
 module.exports = {
 	Query: {
 	  launches: async (_, { pageSize = 20, after }, { dataSources }) => {
@@ -90,6 +92,35 @@ module.exports = {
 		  message: 'trip cancelled',
 		  launches: [launch],
 		};
+		},
+		
+		pay: async (_, { source }, { req }) => {
+			try {
+				// Create the PaymentIntent
+				let intent = await stripe.paymentIntents.create({
+					amount: 1099,
+					currency: 'usd',
+					payment_method: request.body.payment_method_id,
+		
+					// A PaymentIntent can be confirmed some time after creation,
+					// but here we want to confirm (collect payment) immediately.
+					confirm: true,
+		
+					// If the payment requires any follow-up actions from the
+					// customer, like two-factor authentication, Stripe will error
+					// and you will need to prompt them for a new payment method.
+					error_on_requires_action: true
+				});
+				return 'ok';
+			} catch (e) {
+				if (e.type === 'StripeCardError') {
+					// Display error on client
+					return 'StripeCardError';
+				} else {
+					// Something else happened
+					return 'Error';
+				}
+			}
 	  },
 	},
 };

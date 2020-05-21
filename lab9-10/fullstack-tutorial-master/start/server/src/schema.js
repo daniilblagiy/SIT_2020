@@ -61,6 +61,7 @@ const typeDefs = gql`
 	bookTrips(launchIds: [ID]!): TripUpdateResponse!
 	cancelTrip(launchId: ID!): TripUpdateResponse!
 	login(email: String): String # login token
+	pay(source: String): String
   }
 
   type TripUpdateResponse {

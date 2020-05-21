@@ -18,7 +18,7 @@ const server = new ApolloServer({
 	  if (!isEmail.validate(email)) return { user: null };
 	  // find a user by their email
 	  const users = await store.users.findOrCreate({ where: { email } });
-	  const user = users && users[0] || null;
+		const user = users && users[0] || null;
   
 	  return { user: { ...user.dataValues } };
 	},
