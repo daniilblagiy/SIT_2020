@@ -7,6 +7,8 @@ import { LAUNCH_TILE_DATA } from './launches';
 import { RouteComponentProps } from '@reach/router';
 import * as GetMyTripsTypes from './__generated__/GetMyTrips';
 
+import CheckoutForm from '../CheckoutForm';
+
 export const GET_MY_TRIPS = gql`
   query GetMyTrips {
     me {
@@ -35,7 +37,13 @@ const Profile: React.FC<ProfileProps> = () => {
   return (
     <Fragment>
       <Header>My Trips</Header>
-      {data.me && data.me.trips.length ? (
+      {localStorage.getItem('to_pay') === "true" ? (
+        <div>
+        <h2>Total: ${Number(localStorage.getItem('to_pay_trips')) * 10}</h2>
+        <CheckoutForm />
+        </div>
+      ) :
+        data.me && data.me.trips.length ? (
         data.me.trips.map((launch: any) => (
           <LaunchTile key={launch.id} launch={launch} />
         ))

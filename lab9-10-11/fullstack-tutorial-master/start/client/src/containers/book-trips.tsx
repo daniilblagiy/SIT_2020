@@ -34,8 +34,9 @@ const BookTrips: React.FC<BookTripsProps> = ({ cartItems, to_pay }) => {
         variables: { launchId },
       })),
       update(cache) {
+        localStorage.setItem('to_pay', "true");
+        localStorage.setItem('to_pay_trips', cartItems.length.toString());
         cache.writeData({ data: { cartItems: [], to_pay: true } });
-        localStorage.setItem('to_pay', "true")
       },
     }
   );

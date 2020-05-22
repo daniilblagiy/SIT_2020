@@ -29,9 +29,11 @@ const Cart: React.FC<CartProps> = () => {
     <Fragment>
       <Header>My Cart</Header>
       // eslint-disable-next-line
-      {1 > 5 ? (<p></p>):1 < 5 ? (<p></p>):(<p></p>)}
       {localStorage.getItem('to_pay') === "true" ? (
+        <div>
+        <h2>Total: ${Number(localStorage.getItem('to_pay_trips')) * 10}</h2>
         <CheckoutForm />
+        </div>
       ) :
         !data || !!data && data.cartItems.length === 0 ? (
         <p data-testid="empty-message">No items in your cart</p>

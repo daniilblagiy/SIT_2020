@@ -13,11 +13,10 @@ export const STRIPE_PAY = gql`
   }
 `;
 
-export async function useToken(token) {
+function useToken(token) {
   const [pay] = useMutation(STRIPE_PAY);
-  const result = await pay({ variables: { token } });
-  //console.log(result);
-  //return result;
+  const result = pay({ variables: { token } });
+  return result;
 }
 
 export default function CheckoutForm() {
@@ -27,9 +26,15 @@ export default function CheckoutForm() {
     console.log(result);
   }*/
 
-  // ...
-
-    return (
+  const onToken = (token) => {
+    //const result = useToken(token);
+    console.log(token);
+    localStorage.setItem('to_pay', "false");
+    localStorage.setItem('to_pay_trips', "0");
+    window.location.reload(false);
+  }
+ 
+  return (
       /*<Mutation mutation = {STRIPE_PAY}>
       {(mutate) => (<StripeCheckout
         token={async (token) => {
@@ -40,7 +45,9 @@ export default function CheckoutForm() {
       </Mutation>*/
 
       <StripeCheckout
-        token={useToken}
+        token={onToken}
+        amount={Number(localStorage.getItem('to_pay_trips')) * 10 * 100} // cents
+        currency="USD"
         stripeKey="pk_test_TYooMQauvdEDq54NiTphI7jx"
       />
     );
