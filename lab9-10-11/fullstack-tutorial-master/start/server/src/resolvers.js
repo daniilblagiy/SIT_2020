@@ -60,7 +60,34 @@ module.exports = {
 	    const user = await dataSources.userAPI.findOrCreateUser({ email });
 	    if (user) return Buffer.from(email).toString('base64');
 	  },
-	  bookTrips: async (_, { launchIds }, { dataSources }) => {
+	  bookTrips: async (_, { launchIds, cardToken }, { dataSources }) => {
+      let paymentStatus;
+
+      if (cardToken){
+        const stripe = require('stripe')('sk_test_B68WUIp7w6QL1EShG3qtLI9p00nKDnTYVd');
+
+        try {
+          const intent = await stripe.paymentIntents.create({
+            amount: 1000,
+            currency: 'usd',
+            payment_method: cardToken,
+
+            // A PaymentIntent can be confirmed some time after creation,
+            // but here we want to confirm (collect payment) immediately.
+            confirm: true,
+
+            // If the payment requires any follow-up actions from the
+            // customer, like two-factor authentication, Stripe will error
+            // and you will need to prompt them for a new payment method.
+            error_on_requires_action: true
+          });
+
+          paymentStatus=intent.status;
+        } catch (e) {
+          throw new Error(e)
+        }
+			}
+			
 		const results = await dataSources.userAPI.bookTrips({ launchIds });
 		const launches = await dataSources.launchAPI.getLaunchesByIds({
 		  launchIds,
@@ -74,7 +101,8 @@ module.exports = {
 			  : `the following launches couldn't be booked: ${launchIds.filter(
 				  id => !results.includes(id),
 				)}`,
-		  launches,
+			launches,
+			paymentStatus,
 		};
 	  },
 	  cancelTrip: async (_, { launchId }, { dataSources }) => {
@@ -93,34 +121,5 @@ module.exports = {
 		  launches: [launch],
 		};
 		},
-		
-		pay: async (_, { source }, { req }) => {
-			try {
-				// Create the PaymentIntent
-				let intent = await stripe.paymentIntents.create({
-					amount: 1099,
-					currency: 'usd',
-					payment_method: request.body.payment_method_id,
-		
-					// A PaymentIntent can be confirmed some time after creation,
-					// but here we want to confirm (collect payment) immediately.
-					confirm: true,
-		
-					// If the payment requires any follow-up actions from the
-					// customer, like two-factor authentication, Stripe will error
-					// and you will need to prompt them for a new payment method.
-					error_on_requires_action: true
-				});
-				return 'ok';
-			} catch (e) {
-				if (e.type === 'StripeCardError') {
-					// Display error on client
-					return 'StripeCardError';
-				} else {
-					// Something else happened
-					return 'Error';
-				}
-			}
-	  },
 	},
 };

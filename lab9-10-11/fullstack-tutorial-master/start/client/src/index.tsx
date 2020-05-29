@@ -55,7 +55,8 @@ const IS_LOGGED_IN = gql`
 
 function IsLoggedIn() {
   const { data } = useQuery(IS_LOGGED_IN);
-  return data.isLoggedIn ? <Pages /> : <Login />;
+  //return data.isLoggedIn ? <Pages /> : <Login />;
+  return data?.isLoggedIn ? <Pages /> : <Login />;
 }
 
 injectStyles();

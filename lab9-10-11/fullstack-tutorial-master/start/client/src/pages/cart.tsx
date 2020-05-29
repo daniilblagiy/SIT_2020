@@ -7,7 +7,10 @@ import { CartItem, BookTrips } from '../containers';
 import { RouteComponentProps } from '@reach/router';
 import * as GetCartItemsTypes from './__generated__/GetCartItems';
 
-import CheckoutForm from '../CheckoutForm';
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe("pk_test_m4yyYqIglZdw6gzTYkwyylYr007BNEV7mI");
 
 export const GET_CART_ITEMS = gql`
   query GetCartItems {
@@ -29,20 +32,17 @@ const Cart: React.FC<CartProps> = () => {
     <Fragment>
       <Header>My Cart</Header>
       // eslint-disable-next-line
-      {localStorage.getItem('to_pay') === "true" ? (
-        <div>
-        <h2>Total: ${Number(localStorage.getItem('to_pay_trips')) * 10}</h2>
-        <CheckoutForm />
-        </div>
-      ) :
-        !data || !!data && data.cartItems.length === 0 ? (
+      {!data || !!data && data.cartItems.length === 0 ? (
         <p data-testid="empty-message">No items in your cart</p>
       ) : (
         <Fragment>
           {!!data && data.cartItems.map((launchId: any) => (
             <CartItem key={launchId} launchId={launchId} />
           ))}
-          <BookTrips cartItems={!!data ? data.cartItems : []} to_pay={!!data ? data.to_pay : false} />
+          <h2>Total Price: ${data.cartItems.length * 10.00} $</h2>
+          <Elements stripe={stripePromise}>
+            <BookTrips cartItems={!!data ? data.cartItems : []}/>
+          </Elements>
         </Fragment>
       )}
     </Fragment>

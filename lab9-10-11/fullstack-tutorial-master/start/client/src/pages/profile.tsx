@@ -37,13 +37,7 @@ const Profile: React.FC<ProfileProps> = () => {
   return (
     <Fragment>
       <Header>My Trips</Header>
-      {localStorage.getItem('to_pay') === "true" ? (
-        <div>
-        <h2>Total: ${Number(localStorage.getItem('to_pay_trips')) * 10}</h2>
-        <CheckoutForm />
-        </div>
-      ) :
-        data.me && data.me.trips.length ? (
+      {data.me && data.me.trips.length ? (
         data.me.trips.map((launch: any) => (
           <LaunchTile key={launch.id} launch={launch} />
         ))
